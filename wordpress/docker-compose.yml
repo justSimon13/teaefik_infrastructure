@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: password
+      WORDPRESS_DB_NAME: wordpressdb
+    volumes:
+      - wordpress:/var/www/html
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.wordpress.rule=Host(`domain.de`)"
+    - "traefik.http.routers.wordpress.entrypoints=websecure"
+    - "traefik.http.routers.wordpress.tls.certresolver=basic"
+    networks:
+      - traefik
+
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpressdb
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: password
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+
+networks:
+  traefik:
+      external: true  
+
