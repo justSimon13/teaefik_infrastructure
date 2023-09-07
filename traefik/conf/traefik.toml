@@ -1,0 +1,19 @@
+[providers.docker]
+
+[api]
+  insecure = false
+  dashboard = true
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.websecure]
+    address = ":443"
+    [entryPoints.websecure.http.tls]
+      certResolver = "basic"
+
+[certificatesResolvers.basic.acme]
+  email = "email@domain.de"
+  storage = "/letsencrypt/acme.json"
+  [certificatesResolvers.basic.acme.httpchallenge]
+    entrypoint = "web"
