@@ -18,8 +18,7 @@ services:
     - "traefik.http.routers.wordpress.tls.certresolver=basic"
     networks:
       - traefik
-
-
+  
   db:
     image: mysql:5.7
     restart: always
@@ -38,4 +37,3 @@ volumes:
 networks:
   traefik:
       external: true  
-
