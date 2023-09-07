@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+    container_name: keycloak
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: keycloak-db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55word
+      PROXY_ADDRESS_FORWARDING: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.keycloak.rule=Host(`keycloak.localhost`)"
+      - "traefik.http.routers.keycloak.tls=true"
+      - "traefik.http.routers.keycloak.tls.certresolver=basic"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    networks:
+      - keycloak
+      - traefik
+    depends_on:
+      - keycloak-db
+
+  keycloak-db:
+    image: mysql:latest
+    container_name: keycloak-db
+    environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - keycloak_data:/var/lib/mysql
+    networks:
+      - keycloak
+
+volumes:
+  keycloak_data:
+
+networks:
+  traefik:
+    external: true
+  keycloak:
